@@ -1,0 +1,256 @@
+<!--
+  Single-file responsive website with modern graphics and simple interactions.
+  Usage: Save this as `index.html` and open in a browser. No build tools needed.
+  Features:
+    - Animated gradient background
+    - SVG blob + subtle particle effect
+    - Glassmorphism cards and nav
+    - Responsive layout (hero, features, gallery, contact)
+    - Small JS for smooth scroll and theme toggle
+  Author: ChatGPT
+-->
+
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>সুন্দর গ্রাফিক্স ওয়েবসাইট</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg1:#0f172a; --bg2:#0b1224; --card: rgba(255,255,255,0.06);
+      --accent-1: #7c3aed; --accent-2: #06b6d4; --glass: rgba(255,255,255,0.06);
+      --glass-border: rgba(255,255,255,0.08);
+      --text: rgba(255,255,255,0.92);
+      --muted: rgba(255,255,255,0.65);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:Inter,system-ui,Segoe UI, Roboto, 'Helvetica Neue', Arial;
+      background: radial-gradient(1200px 600px at 10% 10%, rgba(124,58,237,0.12), transparent),
+                  radial-gradient(900px 400px at 90% 90%, rgba(6,182,212,0.08), transparent),
+                  linear-gradient(180deg,var(--bg1),var(--bg2));
+      color:var(--text); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+      overflow-x:hidden;padding-bottom:60px;
+    }
+
+    /* animated gradient overlay */
+    .bg-anim{position:fixed;inset:0;z-index:0;pointer-events:none;mix-blend-mode:overlay;opacity:0.6}
+    .bg-anim svg{width:120%;height:120%}
+
+    header{position:sticky;top:14px;z-index:30;padding:18px 28px;display:flex;align-items:center;justify-content:space-between}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:46px;height:46px;border-radius:10px;background:linear-gradient(135deg,var(--accent-1),var(--accent-2));display:flex;align-items:center;justify-content:center;font-weight:800;box-shadow:0 6px 20px rgba(2,6,23,0.6)}
+    .logo span{font-size:18px;color:white}
+    nav{display:flex;gap:14px;align-items:center}
+    nav a{color:var(--muted);text-decoration:none;font-weight:600;padding:8px 12px;border-radius:10px}
+    nav a:hover{color:var(--text);background:linear-gradient(90deg, rgba(255,255,255,0.03), transparent)}
+
+    .container{max-width:1100px;margin:40px auto;padding:0 20px;position:relative;z-index:10}
+    .hero{display:grid;grid-template-columns:1fr 420px;gap:30px;align-items:center;margin-top:18px}
+
+    .hero-left h1{font-size:40px;line-height:1.03;margin:0 0 12px}
+    .hero-left p{color:var(--muted);margin:0 0 18px}
+    .cta{display:flex;gap:12px}
+    .btn{padding:12px 18px;border-radius:12px;border:0;font-weight:700;cursor:pointer}
+    .btn-primary{background:linear-gradient(90deg,var(--accent-1),var(--accent-2));color:white;box-shadow:0 10px 30px rgba(8,7,27,0.5)}
+    .btn-ghost{background:transparent;border:1px solid var(--glass-border);color:var(--text)}
+
+    /* glass card */
+    .glass{background:var(--glass);border:1px solid var(--glass-border);backdrop-filter: blur(8px);padding:18px;border-radius:16px}
+
+    /* features */
+    .features{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:28px 0}
+    .feature{padding:18px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent)}
+    .feature h3{margin:8px 0 6px}
+    .muted{color:var(--muted);font-size:14px}
+
+    /* gallery */
+    .gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:22px 0}
+    .media{height:120px;border-radius:10px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));font-weight:600}
+
+    /* footer/contact */
+    footer{margin-top:36px;padding:22px 0;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
+
+    /* responsive */
+    @media (max-width:980px){
+      .hero{grid-template-columns:1fr;}
+      .gallery{grid-template-columns:repeat(2,1fr)}
+      .features{grid-template-columns:repeat(2,1fr)}
+    }
+    @media (max-width:520px){
+      header{padding:12px 14px}
+      .container{padding:0 14px}
+      .hero-left h1{font-size:28px}
+      .gallery{grid-template-columns:1fr}
+      .features{grid-template-columns:1fr}
+      nav{display:none}
+    }
+
+    /* small decorative dots */
+    .dots{position:absolute;right:-80px;top:120px;width:220px;opacity:0.12}
+
+    /* tiny animation */
+    .float{animation:float 6s ease-in-out infinite}
+    @keyframes float{0%{transform:translateY(0)}50%{transform:translateY(-12px)}100%{transform:translateY(0)}}
+  </style>
+</head>
+<body>
+  <!-- animated SVG background -->
+  <div class="bg-anim" aria-hidden="true">
+    <svg viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <linearGradient id="g1" x1="0" x2="1" y1="0" y2="1">
+          <stop offset="0%" stop-color="#7c3aed" stop-opacity="0.35"/>
+          <stop offset="100%" stop-color="#06b6d4" stop-opacity="0.35"/>
+        </linearGradient>
+      </defs>
+      <g>
+        <circle cx="200" cy="150" r="220" fill="url(#g1)">
+          <animate attributeName="cx" dur="18s" values="200;600;300;200" repeatCount="indefinite" />
+          <animate attributeName="cy" dur="20s" values="150;400;200;150" repeatCount="indefinite" />
+        </circle>
+        <ellipse cx="620" cy="420" rx="260" ry="160" fill="#0b1224" opacity="0.18">
+          <animate attributeName="cx" dur="24s" values="620;120;520;620" repeatCount="indefinite" />
+        </ellipse>
+      </g>
+    </svg>
+  </div>
+
+  <header class="container">
+    <div class="brand">
+      <div class="logo"><span>MW</span></div>
+      <div>
+        <div style="font-weight:800">Magic World</div>
+        <div style="font-size:12px;color:var(--muted)">সৃজনশীল ডিজাইন &amp; কোড</div>
+      </div>
+    </div>
+
+    <nav>
+      <a href="#features">ফিচার</a>
+      <a href="#gallery">গ্যালারি</a>
+      <a href="#contact">যোগাযোগ</a>
+      <button id="themeToggle" class="btn btn-ghost">থিম</button>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div class="hero-left">
+        <h1>স্টাইলিশ, দ্রুত ও রেসপনসিভ ওয়েবসাইট</h1>
+        <p>এই টেমপ্লেটটি ছোট, পরিষ্কার এবং গ্রাফিক্স-ফ্রেন্ডলি — আপনার ব্র্যান্ড বা পোর্টফোলিও দেখানোর জন্য উপযুক্ত।</p>
+        <div class="cta">
+          <button class="btn btn-primary" onclick="scrollToSection('contact')">এখানে শুরু করুন</button>
+          <button class="btn btn-ghost" onclick="downloadDemo()">ডেমো ডাউনলোড</button>
+        </div>
+
+        <div class="features" id="features">
+          <div class="feature glass">
+            <div style="font-size:22px">🎨</div>
+            <h3>ডিজাইন ফাষ্ট</h3>
+            <div class="muted">আকর্ষণীয় গ্রেডিয়েন্ট ও গ্লাস কার্ড</div>
+          </div>
+          <div class="feature glass">
+            <div style="font-size:22px">⚡</div>
+            <h3>পারফরম্যান্স</h3>
+            <div class="muted">কম কোডে দ্রুত লোডিং</div>
+          </div>
+          <div class="feature glass">
+            <div style="font-size:22px">🔧</div>
+            <h3>সহজ কাস্টমাইজ</h3>
+            <div class="muted">রঙ, ফন্ট ও কনটেন্ট বদলাতে সহজ</div>
+          </div>
+        </div>
+
+      </div>
+
+      <aside class="glass float" style="width:100%;max-width:420px">
+        <!-- SVG blob with simple illustration -->
+        <svg viewBox="0 0 600 600" style="width:100%;height:320px;display:block">
+          <defs>
+            <linearGradient id="blobGrad" x1="0" x2="1">
+              <stop offset="0%" stop-color="#7c3aed" />
+              <stop offset="100%" stop-color="#06b6d4" />
+            </linearGradient>
+            <filter id="f1" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="18" result="blur"/>
+              <feBlend in="SourceGraphic" in2="blur" />
+            </filter>
+          </defs>
+          <g filter="url(#f1)">
+            <path fill="url(#blobGrad)" d="M459,328Q436,406,358,430Q280,454,203,423Q126,392,91,323Q56,254,86,185Q116,116,186,86Q256,56,326,77Q396,98,442,151Q488,204,459,328Z"></path>
+          </g>
+          <!-- small device mockup -->
+          <rect x="210" y="180" width="180" height="260" rx="22" fill="#0b1224" opacity="0.9"/>
+          <circle cx="300" cy="360" r="8" fill="#7c3aed"/>
+        </svg>
+
+        <div style="margin-top:10px">
+          <strong>পোর্টফোলিও রেডি</strong>
+          <div class="muted" style="margin-top:6px">আপনার ছবি ও প্রোজেক্ট এখানে সহজে বসান</div>
+        </div>
+      </aside>
+
+    </section>
+
+    <section id="gallery">
+      <h2 style="margin-top:26px">গ্যালারি</h2>
+      <div class="gallery">
+        <div class="media">প্রকল্প ১</div>
+        <div class="media">প্রকল্প ২</div>
+        <div class="media">প্রকল্প ৩</div>
+        <div class="media">প্রকল্প ৪</div>
+      </div>
+    </section>
+
+    <div class="dots" aria-hidden="true">
+      <svg viewBox="0 0 120 120" width="220" height="220"><g fill="white"><circle cx="10" cy="10" r="2"/><circle cx="30" cy="30" r="2"/><circle cx="50" cy="50" r="2"/><circle cx="70" cy="70" r="2"/><circle cx="90" cy="90" r="2"/></g></svg>
+    </div>
+
+    <section id="contact" style="margin-top:18px">
+      <div class="glass" style="padding:18px">
+        <h3>যোগাযোগ করুন</h3>
+        <p class="muted">নিচে নাম, ইমেইল ও বার্তা দিলে আমি দ্রুত উত্তর দেব। (এই টেমপ্লেট ডেমো স্ট্যান্ড-অ্যালোন)</p>
+        <form onsubmit="event.preventDefault(); alert('ধন্যবাদ! ফর্মটি সাবমিট হয়েছে — ডেমো মোড।');" style="margin-top:12px;display:grid;gap:8px">
+          <input type="text" placeholder="নাম" required style="padding:10px;border-radius:10px;border:1px solid var(--glass-border);background:transparent;color:var(--text)"/>
+          <input type="email" placeholder="ইমেইল" required style="padding:10px;border-radius:10px;border:1px solid var(--glass-border);background:transparent;color:var(--text)"/>
+          <textarea placeholder="বার্তা" rows="4" style="padding:10px;border-radius:10px;border:1px solid var(--glass-border);background:transparent;color:var(--text)"></textarea>
+          <div style="display:flex;gap:8px;justify-content:flex-end">
+            <button class="btn btn-primary" type="submit">পাঠান</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <footer>
+      <div>© <strong>Magic World</strong> — সব অধিকার সংরক্ষিত</div>
+      <div class="muted">বিল্ড: single-file demo • পরিবর্তন করতে মুক্ত</div>
+    </footer>
+  </main>
+
+  <script>
+    // small interactions
+    function scrollToSection(id){
+      document.getElementById(id).scrollIntoView({behavior:'smooth',block:'center'});
+    }
+    function downloadDemo(){
+      const blob = new Blob([document.documentElement.outerHTML],{type:'text/html'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'demo-website.html'; a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // theme toggle — simple inversion
+    document.getElementById('themeToggle').addEventListener('click',()=>{
+      const body = document.body;
+      if(body.style.filter){ body.style.filter=''; document.getElementById('themeToggle').innerText='থিম' }
+      else{ body.style.filter='invert(1) hue-rotate(180deg)'; document.getElementById('themeToggle').innerText='রিস্টোর' }
+    });
+  </script>
+</body>
+</html>
